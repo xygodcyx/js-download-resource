@@ -1,0 +1,21 @@
+{
+  "name": "js-download-resource",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node app.js",
+    "build": "pkg app.js -t node18-win-x64 -c package.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cheerio": "1.0.0"
+  },
+  "pkg": {
+    "assets": [
+      "node_modules/**/*"
+    ]
+  }
+}
