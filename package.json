@@ -1,9 +1,9 @@
 {
-  "name": "dspres",
-  "version": "1.0.2",
+  "name": "dlres",
+  "version": "1.0.0",
   "main": "app.js",
   "bin": {
-    "dspres": "./app.js"
+    "dlres": "./app.js"
   },
   "type": "commonjs",
   "scripts": {
