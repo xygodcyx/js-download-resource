@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const cheerio = require("cheerio")
 const path = require("path")
 const fs = require("fs")

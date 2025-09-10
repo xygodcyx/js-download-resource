@@ -1,14 +1,23 @@
 {
-  "name": "js-download-resource",
+  "name": "dspres",
   "version": "1.0.0",
   "main": "app.js",
+  "bin": {
+    "dspres": "./app.js"
+  },
+  "type": "commonjs",
   "scripts": {
     "dev": "node app.js",
     "build": "pkg app.js -t node18-win-x64 -c package.json"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "spriters-resource",
+    "spriters",
+    "resource",
+    "download"
+  ],
+  "author": "xygodcyx",
+  "license": "MIT",
   "description": "",
   "dependencies": {
     "cheerio": "1.0.0"
