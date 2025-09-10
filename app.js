@@ -110,9 +110,9 @@ function parseHtml(html) {
  * @param {number} count 分类数量
  * @param {Array<TAsset>} assets 资源名称和下载地址
  */
-async function downloadAssets(baseClassify, classify, count, assets, jumpIndex) {
+async function downloadAssets(pathStr, baseClassify, classify, count, assets, jumpIndex) {
     jumpIndex = +jumpIndex
-    const outDirActual = path.join(__dirname, outDir, sanitizeWindowsPath(baseClassify), sanitizeWindowsPath(classify))
+    const outDirActual = path.join(pathStr, sanitizeWindowsPath(baseClassify), sanitizeWindowsPath(classify))
 
     if (outDir && !fs.existsSync(outDirActual)) {
         fs.mkdirSync(outDirActual, { recursive: true })
@@ -152,7 +152,7 @@ async function downloadAssets(baseClassify, classify, count, assets, jumpIndex) 
     }
 }
 
-async function run(url, jumpClassifyIndex = 0, jumpAssetIndex = 0) {
+async function run(url, userPath = "", jumpClassifyIndex = 0, jumpAssetIndex = 0) {
     let curJumpClassifyIndex = jumpClassifyIndex
     let curJumpAssetIndex = jumpAssetIndex
     const html = await fetchWebPage(url)
@@ -163,12 +163,13 @@ async function run(url, jumpClassifyIndex = 0, jumpAssetIndex = 0) {
     const downloadPool = parseHtml(html)
     const baseClassifyArr = url.split("/")
     const baseClassify = baseClassifyArr[baseClassifyArr.length - 1] ? baseClassifyArr[baseClassifyArr.length - 1] : baseClassifyArr[baseClassifyArr.length - 2]
+    const pathStr = userPath === "" ? path.join(__dirname, outDir) : userPath
     for (let i = curJumpClassifyIndex; i < downloadPool.length; i++) {
         const pool = downloadPool[i];
         const classify = pool.classify
         const count = pool.classifyCount
         console.log(`正在处理类别：${classify} , 共 ${count} 个资源 `)
-        await downloadAssets(baseClassify, classify, count, pool.assets, curJumpAssetIndex)
+        await downloadAssets(pathStr, baseClassify, classify, count, pool.assets, curJumpAssetIndex)
         curJumpIndex = 0
     }
 }
