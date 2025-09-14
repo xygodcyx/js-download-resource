@@ -39,7 +39,7 @@ async function fetchWebPage(url) {
     return cheerio.load(html)
 }
 
-function parseHtml(html) {
+function parseHtml(html, forceExt) {
     const $ = html
     /**
      * @type {Array<TPool>} 待下载池子
@@ -84,6 +84,10 @@ function parseHtml(html) {
                     assetPath = assetPath.replace(ext, 'zip');
                     ext = "zip"
                 }
+                if (forceExt) {
+                    assetPath = assetPath.replace(ext, forceExt);
+                    ext = forceExt
+                }
                 if (title && assetPath) {
                     assets.push({
                         title,
@@ -110,7 +114,7 @@ function parseHtml(html) {
  * @param {number} count 分类数量
  * @param {Array<TAsset>} assets 资源名称和下载地址
  */
-async function downloadAssets(pathStr, baseClassify, classify, count, assets, jumpIndex) {
+async function downloadAssets(pathStr, forceExt, baseClassify, classify, count, assets, jumpIndex) {
     jumpIndex = +jumpIndex
     const outDirActual = path.join(pathStr, sanitizeWindowsPath(baseClassify), sanitizeWindowsPath(classify))
 
@@ -129,7 +133,7 @@ async function downloadAssets(pathStr, baseClassify, classify, count, assets, ju
         if (!res.ok) throw new Error(`下载失败: ${asset.path}`)
 
         const title = asset.title.split("?")[0]
-        const filePath = path.join(outDirActual, `${sanitizeWindowsPath(title)}.${asset.ext}`)
+        const filePath = path.join(outDirActual, `${sanitizeWindowsPath(title)}.${forceExt || asset.ext}`)
         const writer = fs.createWriteStream(filePath)
 
         console.log(` 正在下载: ${asset.title} (${i + 1}/${count})`)
@@ -152,7 +156,7 @@ async function downloadAssets(pathStr, baseClassify, classify, count, assets, ju
     }
 }
 
-async function run(url, userPath = "", jumpClassifyIndex = 0, jumpAssetIndex = 0) {
+async function run(url, userPath = "", forceExt = "", jumpClassifyIndex = 0, jumpAssetIndex = 0) {
     let curJumpClassifyIndex = jumpClassifyIndex
     let curJumpAssetIndex = jumpAssetIndex
     const html = await fetchWebPage(url)
@@ -160,16 +164,16 @@ async function run(url, userPath = "", jumpClassifyIndex = 0, jumpAssetIndex = 0
     /**
      * @type {Array<TPool>} 待下载池子
      */
-    const downloadPool = parseHtml(html)
+    const downloadPool = parseHtml(html, forceExt)
     const baseClassifyArr = url.split("/")
     const baseClassify = baseClassifyArr[baseClassifyArr.length - 1] ? baseClassifyArr[baseClassifyArr.length - 1] : baseClassifyArr[baseClassifyArr.length - 2]
-    const pathStr = userPath === "" ? path.join(__dirname, outDir) : userPath
+    const pathStr = userPath === "0" ? path.join(__dirname, outDir) : userPath
     for (let i = curJumpClassifyIndex; i < downloadPool.length; i++) {
         const pool = downloadPool[i];
         const classify = pool.classify
         const count = pool.classifyCount
         console.log(`正在处理类别：${classify} , 共 ${count} 个资源 `)
-        await downloadAssets(pathStr, baseClassify, classify, count, pool.assets, curJumpAssetIndex)
+        await downloadAssets(pathStr, forceExt, baseClassify, classify, count, pool.assets, curJumpAssetIndex)
         curJumpIndex = 0
     }
 }
